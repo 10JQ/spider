@@ -6,10 +6,15 @@ url = 'http://music.163.com/#/discover/playlist/' \
     '?order=hot&cat=%E5%85%A8%E9%83%A8&limit=35&offset=0'
 
 # 用PhantomJS接口创建一个Selenium的WebDriver
-driver = webdriver.PhantomJS()
+service_args=[]
+service_args.append('--load-images=no')  ##关闭图片加载
+#service_args.append('--disk-cache=yes')  ##开启缓存
+#service_args.append('--ignore-ssl-errors=true') ##忽略https错误
+
+driver = webdriver.PhantomJS(service_args=service_args)
 
 # 准备好CSV文件
-csv_file = open('playlist.csv', 'w', newline='')
+csv_file = open('playlist.csv', 'w', newline='', encoding='utf8')
 writer = csv.writer(csv_file)
 writer.writerow(['标题', '播放数', '链接'])
 
@@ -30,7 +35,13 @@ while url != 'javascript:void(0)':
             msk = data_i.find_element_by_css_selector('a.msk')
             # 将标题/播放数/链接写入CSV文件
             writer.writerow([msk.get_attribute('title'), nb, msk.get_attribute('href')])
+            print("{}\t：{}".format(nb, msk.get_attribute('title')))
     # 取得下一页的URL
     url = driver.find_element_by_css_selector('a.zbtn.znxt').get_attribute('href')
+
+    offset_start = url.find('offset=')
+    if offset_start != -1:
+        offset = url[offset_start + 7 : len(url)]
+    print("\t第{}页".format(int(int(offset) / 35)))
 
 csv_file.close()
