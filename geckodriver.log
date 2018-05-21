@@ -227,3 +227,14 @@ JavaScript error: https://cookiemapping.wrating.com/link.html, line 3: NS_ERROR_
 [GPU 12124, Chrome_ChildThread] WARN
 ###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
 
+1526888349203	geckodriver	INFO	geckodriver 0.20.1
+1526888349212	geckodriver	INFO	Listening on 127.0.0.1:61397
+1526888352135	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\JYP\\AppData\\Local\\Temp\\rust_mozprofile.3HedveKj9x9P"
+Unable to read VR Path Registry from C:\Users\JYP\AppData\Local\openvr\openvrpaths.vrpath
+Unable to read VR Path Registry from C:\Users\JYP\AppData\Local\openvr\openvrpaths.vrpath
+Unable to read VR Path Registry from C:\Users\JYP\AppData\Local\openvr\openvrpaths.vrpath
+Unable to read VR Path Registry from C:\Users\JYP\AppData\Local\openvr\openvrpaths.vrpath
+1526888355625	Marionette	INFO	Listening on port 61409
+1526888355878	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\JYP\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: https://login.taobao.com/jump?target=https://www.tmall.com, line 26: SyntaxError: expected expression, got '<'
