@@ -16,8 +16,8 @@ import os
 import subprocess
 
 g_adsl_account = {"name": "adslgo",
-                "username": "h5sva026",
-                "password": "123456"}
+				"username": "h5sva026",
+				"password": "123456"}
 
 
 class Adsl(object):
@@ -29,7 +29,7 @@ class Adsl(object):
         self.username = g_adsl_account["username"]
         self.password = g_adsl_account["password"]
 
-        
+		
     #==============================================================================
     # set_adsl : 修改adsl设置
     #==============================================================================
@@ -38,7 +38,7 @@ class Adsl(object):
         self.username = account["username"]
         self.password = account["password"]
 
-    
+	
     #==============================================================================
     # connect : 宽带拨号
     #==============================================================================
@@ -48,7 +48,7 @@ class Adsl(object):
         #os.system(cmd_str)
         time.sleep(5)
 
-        
+		
     #==============================================================================
     # disconnect : 断开宽带连接
     #==============================================================================
@@ -58,7 +58,7 @@ class Adsl(object):
         #os.system(cmd_str)
         time.sleep(5)
 
-    
+	
     #==============================================================================
     # reconnect : 重新进行拨号
     #==============================================================================
@@ -125,8 +125,10 @@ if __name__=='__main__':
     
     adsl = Adsl()
 
-    for i in range(0, 100):
-        url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=57a51a51&ClassId=33&Topid=0'
+    for i in range(0, 10000):
+        # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=57a53a51&ClassId=33&Topid=0'
+        url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=51a48a51&ClassId=33&Topid=0'
+        # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=56a53a51&ClassId=33&Topid=0'
         
         firefox_login=init(url)
         if firefox_login == -1:
@@ -135,7 +137,7 @@ if __name__=='__main__':
             continue
             
 
-        print("vote number", i+1, end=":\t")
+        print("{} vote number".format(time.ctime()), i+1, end=":\t")
 
         # 取得投票前的票数
         locator = (By.CLASS_NAME, 'info')
@@ -181,13 +183,13 @@ if __name__=='__main__':
 
         # TODO
 
-        # 票数不动，累计3次，暂停半小时
+        # 票数不动，累计3次，暂停十分钟
         if votes_current == votes_previous:
             votes_fault_times += 1
             if votes_fault_times >=3:
-                print("votes fault times >=3, sleep 30 minutes")
+                print("{}: votes fault times >=3, sleep 30 minutes".format(time.ctime()))
                 votes_fault_times = 0
-                time.sleep(1800)
+                time.sleep(600)
         else:
             votes_fault_times = 0
         
