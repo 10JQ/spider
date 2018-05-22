@@ -4,6 +4,7 @@ import csv
 # 歌单第一页URL
 url = 'http://music.163.com/#/discover/playlist/' \
     '?order=hot&cat=%E5%85%A8%E9%83%A8&limit=35&offset=0'
+# http://music.163.com/#/discover/playlist/?order=hot&cat=%E5%85%A8%E9%83%A8&limit=35&offset=0
 
 # 用PhantomJS接口创建一个Selenium的WebDriver
 service_args=[]
