@@ -1,6 +1,13 @@
+.vscode/
+/.vscode/
 .vscode/settings.json
 /.vscode/settings.json
+.vscode/launch.json
+/.vscode/launch.json
 .idea/
 /.idea/
+
+settings.json
+launch.json
 
 
