@@ -5,61 +5,66 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import UnexpectedAlertPresentException
+from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import NoSuchElementException
 from bs4 import BeautifulSoup  
 import random   
 import re  
 import time   
 import xlwt  
 import os
+import subprocess
 
 g_adsl_account = {"name": "adslgo",
-				"username": "h5sva026",
-				"password": "123456"}
+                "username": "h5sva026",
+                "password": "123456"}
 
 
 class Adsl(object):
-	#==============================================================================
-	# __init__ : name: adsl名称
-	#==============================================================================
-	def __init__(self):
-		self.name = g_adsl_account["name"]
-		self.username = g_adsl_account["username"]
-		self.password = g_adsl_account["password"]
+    #==============================================================================
+    # __init__ : name: adsl名称
+    #==============================================================================
+    def __init__(self):
+        self.name = g_adsl_account["name"]
+        self.username = g_adsl_account["username"]
+        self.password = g_adsl_account["password"]
 
-		
-	#==============================================================================
-	# set_adsl : 修改adsl设置
-	#==============================================================================
-	def set_adsl(self, account):
-		self.name = account["name"]
-		self.username = account["username"]
-		self.password = account["password"]
+        
+    #==============================================================================
+    # set_adsl : 修改adsl设置
+    #==============================================================================
+    def set_adsl(self, account):
+        self.name = account["name"]
+        self.username = account["username"]
+        self.password = account["password"]
 
-	
-	#==============================================================================
-	# connect : 宽带拨号
-	#==============================================================================
-	def connect(self):
-		cmd_str = "rasdial %s %s %s" % (self.name, self.username, self.password)
-		os.system(cmd_str)
-		time.sleep(5)
+    
+    #==============================================================================
+    # connect : 宽带拨号
+    #==============================================================================
+    def connect(self):
+        cmd_str = "rasdial %s %s %s" % (self.name, self.username, self.password)
+        subprocess.run(cmd_str, shell=True)
+        #os.system(cmd_str)
+        time.sleep(5)
 
-		
-	#==============================================================================
-	# disconnect : 断开宽带连接
-	#==============================================================================
-	def disconnect(self):
-		cmd_str = "rasdial %s /disconnect" % self.name
-		os.system(cmd_str)
-		time.sleep(5)
+        
+    #==============================================================================
+    # disconnect : 断开宽带连接
+    #==============================================================================
+    def disconnect(self):
+        cmd_str = "rasdial %s /disconnect" % self.name
+        subprocess.run(cmd_str, shell=True)
+        #os.system(cmd_str)
+        time.sleep(5)
 
-	
-	#==============================================================================
-	# reconnect : 重新进行拨号
-	#==============================================================================
-	def reconnect(self):
-		self.disconnect()
-		self.connect()
+    
+    #==============================================================================
+    # reconnect : 重新进行拨号
+    #==============================================================================
+    def reconnect(self):
+        self.disconnect()
+        self.connect()
 
 
 # 初始化火狐浏览器  
@@ -76,9 +81,15 @@ def init(url):
     # 禁用js
     #firefox_profile.set_preference('javascript.enabled', 'false')
 
-    firefox_login=webdriver.Firefox(firefox_profile=firefox_profile)  
-    firefox_login.get(url)  
-    # firefox_login.maximize_window()  
+    firefox_login=webdriver.Firefox(firefox_profile=firefox_profile)
+    try:
+        firefox_login.get(url)
+    except WebDriverException:
+        firefox_login.quit()
+        return -1
+    # firefox_login.maximize_window()
+    firefox_login.set_window_size(1024, 400)
+    firefox_login.set_window_position(0,0)
     return firefox_login  
 
 # 判断alert是否弹出，捕获异常
@@ -111,24 +122,33 @@ if __name__=='__main__':
     votes_previous = 0
     votes_current = 0
     votes_fault_times = 0
+    
+    adsl = Adsl()
 
-    for i in range(0, 3):
+    for i in range(0, 100):
+        url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=57a51a51&ClassId=33&Topid=0'
+        
+        firefox_login=init(url)
+        if firefox_login == -1:
+            print("not online, reconnect...")
+            adsl.reconnect()
+            continue
+            
 
-        url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=57a51a51&ClassId=33&Topid=0'  
-        firefox_login=init(url) 
+        print("vote number", i+1, end=":\t")
 
-        print("vote number:", i+1, end="\t")
         # 取得投票前的票数
-       
         locator = (By.CLASS_NAME, 'info')
         try:
             WebDriverWait(firefox_login, 10, 0.5).until(EC.presence_of_element_located(locator))
-            time.sleep(3)
+            time.sleep(5)
             votes_previous = int(firefox_login.find_element_by_xpath('//font[@color="red"]').text)
         except TimeoutException:
-            votes_fault_times += 1
+            votes_fault_times += 0
         except UnexpectedAlertPresentException:
-            votes_fault_times += 1
+            votes_fault_times += 0
+        except NoSuchElementException:
+            pass
         
         print("votes_previous:", votes_previous, end="\t")
 
@@ -146,20 +166,32 @@ if __name__=='__main__':
         # 取得投票后的票数
         try:
             WebDriverWait(firefox_login, 10, 0.5).until(EC.presence_of_element_located(locator))
-            time.sleep(3)
+            time.sleep(5)
             votes_current = int(firefox_login.find_element_by_xpath('//font[@color="red"]').text)
         except TimeoutException:
-            votes_fault_times += 1
+            votes_fault_times += 0
         except UnexpectedAlertPresentException:
-            votes_fault_times += 1
+            votes_fault_times += 0
+        except NoSuchElementException:
+            pass
 
         print("votes_current:", votes_current)
 
         firefox_login.quit()
-        
+
         # TODO
+
         # 票数不动，累计3次，暂停半小时
+        if votes_current == votes_previous:
+            votes_fault_times += 1
+            if votes_fault_times >=3:
+                print("votes fault times >=3, sleep 30 minutes")
+                votes_fault_times = 0
+                time.sleep(1800)
+        else:
+            votes_fault_times = 0
+        
         # 达到指定票数后结束程序
+        
         # 重新连接ADSL
-
-
+        adsl.reconnect()
