@@ -81,7 +81,11 @@ def init(url):
     # 禁用js
     #firefox_profile.set_preference('javascript.enabled', 'false')
 
-    firefox_login=webdriver.Firefox(firefox_profile=firefox_profile)
+    # headless模式
+    firefox_options = webdriver.FirefoxOptions()
+    firefox_options.set_headless()
+
+    firefox_login=webdriver.Firefox(firefox_profile=firefox_profile, firefox_options= firefox_options)
     try:
         firefox_login.get(url)
     except WebDriverException:
@@ -126,9 +130,17 @@ if __name__=='__main__':
     adsl = Adsl()
 
     for i in range(0, 10000):
+        # 帅锅
         # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=57a53a51&ClassId=33&Topid=0'
-        url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=51a48a51&ClassId=33&Topid=0'
+        # Otani Noodle
         # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=56a53a51&ClassId=33&Topid=0'
+        # 粤煌
+        # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=49a56a51&ClassId=33&Topid=0'
+        # 福碗
+        url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=51a48a51&ClassId=33&Topid=0'
+        # 玉盛园
+        # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=50a55a51&ClassId=33&Topid=0'
+
         
         firefox_login=init(url)
         if firefox_login == -1:
@@ -143,7 +155,7 @@ if __name__=='__main__':
         locator = (By.CLASS_NAME, 'info')
         try:
             WebDriverWait(firefox_login, 10, 0.5).until(EC.presence_of_element_located(locator))
-            time.sleep(5)
+            time.sleep(2)
             votes_previous = int(firefox_login.find_element_by_xpath('//font[@color="red"]').text)
         except TimeoutException:
             votes_fault_times += 0
@@ -168,7 +180,7 @@ if __name__=='__main__':
         # 取得投票后的票数
         try:
             WebDriverWait(firefox_login, 10, 0.5).until(EC.presence_of_element_located(locator))
-            time.sleep(5)
+            time.sleep(2)
             votes_current = int(firefox_login.find_element_by_xpath('//font[@color="red"]').text)
         except TimeoutException:
             votes_fault_times += 0
@@ -187,7 +199,7 @@ if __name__=='__main__':
         if votes_current == votes_previous:
             votes_fault_times += 1
             if votes_fault_times >=3:
-                print("{}: votes fault times >=3, sleep 30 minutes".format(time.ctime()))
+                print("{}: votes fault times >=3, sleep 10 minutes".format(time.ctime()))
                 votes_fault_times = 0
                 time.sleep(600)
         else:
