@@ -1,6 +1,4 @@
-/.vscode/*.json
+.vscode/
 .idea/
-
-settings.json
 
 
