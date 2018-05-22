@@ -46,7 +46,7 @@ class Adsl(object):
         cmd_str = "rasdial %s %s %s" % (self.name, self.username, self.password)
         subprocess.run(cmd_str, shell=True)
         #os.system(cmd_str)
-        time.sleep(1)
+        time.sleep(5)
 
 		
     #==============================================================================
@@ -56,7 +56,7 @@ class Adsl(object):
         cmd_str = "rasdial %s /disconnect" % self.name
         subprocess.run(cmd_str, shell=True)
         #os.system(cmd_str)
-        time.sleep(1)
+        time.sleep(5)
 
 	
     #==============================================================================
