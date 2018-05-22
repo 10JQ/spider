@@ -9,5 +9,6 @@
 
 settings.json
 launch.json
+*.log
 
 
