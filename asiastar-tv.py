@@ -46,7 +46,7 @@ class Adsl(object):
         cmd_str = "rasdial %s %s %s" % (self.name, self.username, self.password)
         subprocess.run(cmd_str, shell=True)
         #os.system(cmd_str)
-        time.sleep(5)
+        time.sleep(1)
 
 		
     #==============================================================================
@@ -56,7 +56,7 @@ class Adsl(object):
         cmd_str = "rasdial %s /disconnect" % self.name
         subprocess.run(cmd_str, shell=True)
         #os.system(cmd_str)
-        time.sleep(5)
+        time.sleep(1)
 
 	
     #==============================================================================
@@ -96,6 +96,13 @@ def init(url):
     firefox_login.set_window_position(0,0)
     return firefox_login  
 
+# 刷新页面
+def refresh_current_page(firefox_login):
+    try:
+        firefox_login.refresh()
+    except WebDriverException:
+        return -1
+
 # 判断alert是否弹出，捕获异常
 def is_alert_present(firefox_login):
     try: 
@@ -129,21 +136,26 @@ if __name__=='__main__':
     
     adsl = Adsl()
 
-    for i in range(0, 10000):
-        # 帅锅
-        # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=57a53a51&ClassId=33&Topid=0'
-        # Otani Noodle
-        # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=56a53a51&ClassId=33&Topid=0'
-        # 粤煌
-        # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=49a56a51&ClassId=33&Topid=0'
-        # 福碗
-        url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=51a48a51&ClassId=33&Topid=0'
-        # 玉盛园
-        # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=50a55a51&ClassId=33&Topid=0'
+    # 帅锅
+    # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=57a53a51&ClassId=33&Topid=0'
+    # Otani Noodle
+    # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=56a53a51&ClassId=33&Topid=0'
+    # 粤煌
+    # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=49a56a51&ClassId=33&Topid=0'
+    # 福碗
+    url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=51a48a51&ClassId=33&Topid=0'
+    # 玉盛园
+    # url='http://www.asiastar-tv.com/usa/vote/Vote_Show.asp?InfoId=50a55a51&ClassId=33&Topid=0'
 
-        
+    firefox_login=init(url)
+    if firefox_login == -1:
+        print("not online, reconnect...")
+        adsl.reconnect()
         firefox_login=init(url)
-        if firefox_login == -1:
+
+    for i in range(0, 10000):
+        # 刷新
+        if refresh_current_page(firefox_login) == -1:
             print("not online, reconnect...")
             adsl.reconnect()
             continue
@@ -191,8 +203,6 @@ if __name__=='__main__':
 
         print("votes_current:", votes_current)
 
-        firefox_login.quit()
-
         # TODO
 
         # 票数不动，累计3次，暂停十分钟
@@ -209,3 +219,5 @@ if __name__=='__main__':
         
         # 重新连接ADSL
         adsl.reconnect()
+
+    firefox_login.quit()
