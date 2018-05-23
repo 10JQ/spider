@@ -6,6 +6,8 @@
 /.vscode/launch.json
 .idea/
 /.idea/
+venv/
+/venv/
 
 settings.json
 launch.json
