@@ -121,4 +121,96 @@ class Item:
 # __repr__和__str__的区别
 # __str__在交互模式下不起作用，只在str()和print()中有用
 
+#############################################
+# 1_6_字典中的键映射多个值
+#############################################
+# collections.defaultdick
+# 会自动为将要访问的键（就算目前字典中并不存在这样的键）创建映射实体
+from collections import defaultdict
+
+d = defaultdict(list)
+d['a'].append(1)
+d['b'].append(4)
+
+d = defaultdict(set)
+d['a'].add(1)
+d['b'].add(4)
+
+# 也可以用dict.setdefault() 方法来代替:
+d = {} # 一个普通的字典
+d.setdefault('a', []).append(1)
+d.setdefault('a', []).append(2)
+d.setdefault('b', []).append(4)
+
+# setdefault(k, d=None):
+# 如果dict中没有k, 则自动新建一个，并将其value设置为d
+# 如果已经存在，则不设置新值，直接返回对应的value
+# d可以省略，省略时value为None
+# >>> In [1]: a_dict = {'name':'kuli'}
+# >>> In [3]: a_dict.setdefault('name', 'ali')
+# >>> Out[3]: 'kuli'
+# >>> In [4]: a_dict.setdefault('address')
+# >>> In [5]: a_dict
+# >>> Out[5]: {'address': None, 'name': 'kuli'}
+
+#############################################
+# 1_7_字典排序
+#############################################
+# OrderedDict 内部维护着一个根据键插入顺序排序的双向链表。
+# 所以一个 OrderedDict 的大小是一个普通字典的两倍。
+# 每次当一个新的元素插入进来的时候， 它会被放到链表的尾部。
+# 对于一个已经存在的键的重复赋值不会改变键的顺序。
+from collections import OrderedDict
+
+#############################################
+# 1_8_字典的运算
+#############################################
+# 在数据字典中执行求最小值、最大值、排序
+min_price = min(zip(prices.values(), prices.keys()))
+# min_price is (10.75, 'FB')
+max_price = max(zip(prices.values(), prices.keys()))
+# max_price is (612.78, 'AAPL')
+
+#用 zip() 和 sorted() 函数来排列字典数据：
+prices_sorted = sorted(zip(prices.values(), prices.keys()))
+# prices_sorted is [(10.75, 'FB'), (37.2, 'HPQ'),
+#                   (45.23, 'ACME'), (205.55, 'IBM'),
+#                   (612.78, 'AAPL')]
+
+# zip()产生的是一个zip对象，简单理解就是一个元素为Tuple的List
+# 注意zip()函数创建的是一个只能访问一次的迭代器。 比如，下面的代码就会产生错误：
+prices_and_names = zip(prices.values(), prices.keys())
+print(min(prices_and_names)) # OK
+print(max(prices_and_names)) # ValueError: max() arg is an empty sequence
+
+#############################################
+# 1_9_查找两字典的相同点
+#############################################
+# 字典的 keys() 方法返回一个展现键集合的键视图对象。
+# 键视图对象也支持集合操作，比如集合并、交、差运算。
+# 所以，可以直接使用键视图对象而不用先将它们转换成一个 set。
+# 字典的 items() 方法返回一个包含 (键，值) 对的元素视图对象。
+# 这个对象同样也支持集合操作，并且可以被用来查找两个字典有哪些相同的键值对。
+# 字典的 values() 方法也是类似，但是它并不支持这里介绍的集合操作。
+a = {
+    'x' : 1,
+    'y' : 2,
+    'z' : 3
+}
+b = {
+    'w' : 10,
+    'x' : 11,
+    'y' : 2
+}
+# Find keys in common
+a.keys() & b.keys() # { 'x', 'y' }
+# Find keys in a that are not in b
+a.keys() - b.keys() # { 'z' }
+# Find (key,value) pairs in common
+a.items() & b.items() # { ('y', 2) }
+
+# 以现有字典构造一个排除几个指定键的新字典：
+# Make a new dictionary with certain keys removed
+c = {key:a[key] for key in a.keys() - {'z', 'w'}}
+# c is {'x': 1, 'y': 2}
 
