@@ -51,13 +51,20 @@ def get_vote_items(firefox_login):
     for item in items:
         try:
             price = item.find_element_by_css_selector('div.price.g_price.g_price-highlight')
-            if price.text == "¥0.10":
+            price_f = float(price.text[1:])
+            if price_f < 10:
                 item_name = item.find_element_by_css_selector("div.row.row-2.title")
-                shop_name =item.find_element_by_css_selector("a.shopname.J_MouseEneterLeave.J_ShopInfo")
+                item_url = item_name.find_element_by_css_selector("a.J_ClickStat").get_attribute("href")
+                id_index = item_url.find('id=')
+                item_id = item_url[id_index+3:id_index+15]
+                shop_name = item.find_element_by_css_selector("a.shopname.J_MouseEneterLeave.J_ShopInfo")
                 deal_count = item.find_element_by_css_selector("div.deal-cnt")
+                
                 print(item_name.text, end="\t")
                 print(shop_name.text, end="\t")
                 print(deal_count.text)
+                print(item_id)
+
         except NoSuchElementException:
             pass
 
