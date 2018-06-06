@@ -12,5 +12,6 @@ venv/
 settings.json
 launch.json
 *.log
+.DS_Store
 
 
