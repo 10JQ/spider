@@ -14,6 +14,7 @@ import time
 import xlwt  
 import os
 import subprocess
+import pymysql
 
 # 初始化火狐浏览器  
 def init(url): 
@@ -46,14 +47,34 @@ def search(firefox_login):
 
     time.sleep(random.randint(5,8)) 
 
+#数据库连接函数      
+def connDB():  
+    # 打开数据库连接
+    db = pymysql.connect("114.215.99.71","root","yan33ppJun9966A","tb_vote")
+    # 使用cursor()方法获取操作游标 
+    cursor = db.cursor()
+    return (db, cursor)
+
+#写入数据库
+def insertDB(db, cursor, item_data):
+    sql = """INSERT INTO vote(item_id, item_name, shop_name, deal_count, price, scan_time) VALUES('{0}', '{1}', '{2}', '{3}', {4}, unix_timestamp(now()))""".format(item_data[0], item_data[1], item_data[2], item_data[3], item_data[4])
+    cursor.execute(sql)
+    db.commit()
+  
+#关闭数据库连接  
+def exitConn(db, cursor):
+    db.close() 
+
 def get_vote_items(firefox_login):
+    db, cursor = connDB()
     items = firefox_login.find_elements_by_class_name("item")
+    other_keyword = '助力'
     for item in items:
         try:
             price = item.find_element_by_css_selector('div.price.g_price.g_price-highlight')
             price_f = float(price.text[1:])
-            if price_f < 10:
-                item_name = item.find_element_by_css_selector("div.row.row-2.title")
+            item_name = item.find_element_by_css_selector("div.row.row-2.title")
+            if price_f < 10 or other_keyword in item_name.text:
                 item_url = item_name.find_element_by_css_selector("a.J_ClickStat").get_attribute("href")
                 id_index = item_url.find('id=')
                 item_id = item_url[id_index+3:id_index+15]
@@ -63,18 +84,25 @@ def get_vote_items(firefox_login):
                 print(item_name.text, end="\t")
                 print(shop_name.text, end="\t")
                 print(deal_count.text)
+                print(price_f)
                 print(item_id)
+
+                insertDB(db, cursor, (item_id, item_name.text, shop_name.text, deal_count.text, price_f))
 
         except NoSuchElementException:
             pass
 
+    exitConn(db, cursor)
 
 if __name__=='__main__':  
     url='https://www.taobao.com'
 
-    firefox_login = init(url)
-    search(firefox_login)
-    get_vote_items(firefox_login)
+    while True:
+        firefox_login = init(url)
+        search(firefox_login)
+        get_vote_items(firefox_login)
 
-    time.sleep(5)
-    firefox_login.quit()
+        time.sleep(5)
+        firefox_login.quit()
+
+        time.sleep(60)
