@@ -15,6 +15,7 @@ import xlwt
 import os
 import subprocess
 import pymysql
+import datetime
 
 # 初始化火狐浏览器  
 def init(url): 
@@ -94,15 +95,40 @@ def get_vote_items(firefox_login):
 
     exitConn(db, cursor)
 
+def get_vote_items_010(firefox_login):
+    db, cursor = connDB()
+    items = firefox_login.find_elements_by_class_name("item")
+    for item in items:
+        try:
+            price = item.find_element_by_css_selector('div.price.g_price.g_price-highlight')
+            price_f = float(price.text[1:])
+            item_name = item.find_element_by_css_selector("div.row.row-2.title")
+            item_url = item_name.find_element_by_css_selector("a.J_ClickStat").get_attribute("href")
+            id_index = item_url.find('id=')
+            item_id = item_url[id_index+3:id_index+15]
+            shop_name = item.find_element_by_css_selector("a.shopname.J_MouseEneterLeave.J_ShopInfo")
+            deal_count = item.find_element_by_css_selector("div.deal-cnt")
+
+            insertDB(db, cursor, (item_id, item_name.text, shop_name.text, deal_count.text, price_f))
+
+        except NoSuchElementException:
+            pass
+
+    exitConn(db, cursor)
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
 if __name__=='__main__':  
     url='https://www.taobao.com'
+    url_010 = 'https://s.taobao.com/search?q=%E6%8A%95%E7%A5%A8&imgfile=&commend=all&ssid=s5-e&search_type=item&sourceId=tb.index&spm=a21bo.2017.201856-taobao-item.1&ie=utf8&initiative_id=tbindexz_20170306&filter=reserve_price%5B0.1%2C0.1%5D'
 
     while True:
-        firefox_login = init(url)
-        search(firefox_login)
-        get_vote_items(firefox_login)
+        # firefox_login = init(url)
+        # search(firefox_login)
+        # get_vote_items(firefox_login)
+        firefox_login = init(url_010)
+        get_vote_items_010(firefox_login)
 
         time.sleep(5)
         firefox_login.quit()
 
-        time.sleep(60)
+        time.sleep(1800)
