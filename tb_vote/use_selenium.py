@@ -16,16 +16,19 @@ import os
 import subprocess
 import pymysql
 import datetime
+import os
 
 # 初始化火狐浏览器  
 def init(url): 
     # firefox配置
     # 无图
     firefox_profile = webdriver.FirefoxProfile()
+    firefox_profile.set_preference('permissions.default.image', 2)
     # firefox_profile.set_preference('permissions.default.image', 2)
 
     # headless模式
     firefox_options = webdriver.FirefoxOptions()
+    firefox_options.set_headless()
     # firefox_options.set_headless()
 
     firefox_login=webdriver.Firefox(firefox_profile=firefox_profile, firefox_options= firefox_options)
@@ -98,6 +101,7 @@ def get_vote_items(firefox_login):
 def get_vote_items_010(firefox_login):
     db, cursor = connDB()
     items = firefox_login.find_elements_by_class_name("item")
+    n = 0
     for item in items:
         try:
             price = item.find_element_by_css_selector('div.price.g_price.g_price-highlight')
@@ -110,12 +114,12 @@ def get_vote_items_010(firefox_login):
             deal_count = item.find_element_by_css_selector("div.deal-cnt")
 
             insertDB(db, cursor, (item_id, item_name.text, shop_name.text, deal_count.text, price_f))
-
+            n += 1
         except NoSuchElementException:
             pass
 
     exitConn(db, cursor)
-    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Numbers:', n)
 
 if __name__=='__main__':  
     url='https://www.taobao.com'
@@ -130,5 +134,11 @@ if __name__=='__main__':
 
         time.sleep(5)
         firefox_login.quit()
+        time.sleep(5)
+        
+        firefox_cmd = 'taskkill /F /IM firefox.exe'
+        firefox_gd = 'taskkill /F /IM geckodriver.exe'
+        os.system(firefox_cmd)
+        os.system(firefox_gd)
 
         time.sleep(1800)
