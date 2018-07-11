@@ -29,7 +29,6 @@ def init(url):
     # headless模式
     firefox_options = webdriver.FirefoxOptions()
     firefox_options.set_headless()
-    # firefox_options.set_headless()
 
     firefox_login=webdriver.Firefox(firefox_profile=firefox_profile, firefox_options= firefox_options)
     try:
@@ -41,6 +40,9 @@ def init(url):
     # firefox_login.set_window_size(1024, 400)
     firefox_login.set_window_position(0,0)
     return firefox_login
+
+def pulldown(firefox_login):
+    pass
 
 def search(firefox_login):
     firefox_login.find_element_by_id('q').clear()  
@@ -121,16 +123,26 @@ def get_vote_items_010(firefox_login):
     exitConn(db, cursor)
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'Numbers:', n)
 
+    return n
+
 if __name__=='__main__':  
     url='https://www.taobao.com'
     url_010 = 'https://s.taobao.com/search?q=%E6%8A%95%E7%A5%A8&imgfile=&commend=all&ssid=s5-e&search_type=item&sourceId=tb.index&spm=a21bo.2017.201856-taobao-item.1&ie=utf8&initiative_id=tbindexz_20170306&filter=reserve_price%5B0.1%2C0.1%5D'
+    # 不限价的链接
+    # url_010 = 'https://s.taobao.com/search?q=%E6%8A%95%E7%A5%A8&imgfile=&commend=all&ssid=s5-e&search_type=item&sourceId=tb.index&spm=a21bo.2017.201856-taobao-item.1&ie=utf8&initiative_id=tbindexz_20170306&filter=reserve_price%5B%2C%5D'
 
     while True:
         # firefox_login = init(url)
         # search(firefox_login)
         # get_vote_items(firefox_login)
         firefox_login = init(url_010)
-        get_vote_items_010(firefox_login)
+        for i in range(5):
+            if get_vote_items_010(firefox_login) == 0:
+                firefox_login.quit()
+                firefox_login = init(url_010)
+            else:
+                break
+            print("######### --> Error: Can't open the page!")
 
         time.sleep(5)
         firefox_login.quit()
