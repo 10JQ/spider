@@ -63,7 +63,7 @@ def connDB():
 
 #写入数据库
 def insertDB(db, cursor, item_data):
-    sql = """INSERT INTO vote(item_id, item_name, shop_name, deal_count, price, scan_time) VALUES('{0}', '{1}', '{2}', '{3}', {4}, unix_timestamp(now()))""".format(item_data[0], item_data[1], item_data[2], item_data[3], item_data[4])
+    sql = """INSERT INTO vote(item_id, item_name, shop_name, deal_count, price, scan_time) VALUES('{0}', '{1}', '{2}', '{3}', {4}, now())""".format(item_data[0], item_data[1], item_data[2], item_data[3], item_data[4])
     cursor.execute(sql)
     db.commit()
   
@@ -132,6 +132,10 @@ if __name__=='__main__':
     # url_010 = 'https://s.taobao.com/search?q=%E6%8A%95%E7%A5%A8&imgfile=&commend=all&ssid=s5-e&search_type=item&sourceId=tb.index&spm=a21bo.2017.201856-taobao-item.1&ie=utf8&initiative_id=tbindexz_20170306&filter=reserve_price%5B%2C%5D'
 
     while True:
+        firefox_cmd = 'taskkill /F /IM firefox.exe'
+        firefox_gd = 'taskkill /F /IM geckodriver.exe'
+        os.system(firefox_cmd)
+        os.system(firefox_gd)
         # firefox_login = init(url)
         # search(firefox_login)
         # get_vote_items(firefox_login)
@@ -148,8 +152,6 @@ if __name__=='__main__':
         firefox_login.quit()
         time.sleep(5)
         
-        firefox_cmd = 'taskkill /F /IM firefox.exe'
-        firefox_gd = 'taskkill /F /IM geckodriver.exe'
         os.system(firefox_cmd)
         os.system(firefox_gd)
 
