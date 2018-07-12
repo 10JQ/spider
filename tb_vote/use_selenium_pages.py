@@ -53,7 +53,7 @@ def connDB():
 
 #写入数据库
 def insertDB(db, cursor, item_data):
-    sql = """INSERT INTO vote(item_id, item_name, shop_name, deal_count, price, scan_time) VALUES('{0}', '{1}', '{2}', '{3}', {4}, now())""".format(item_data[0], item_data[1], item_data[2], item_data[3], item_data[4])
+    sql = """INSERT INTO vote_price1(item_id, item_name, shop_name, deal_count, price, scan_time) VALUES('{0}', '{1}', '{2}', '{3}', {4}, now())""".format(item_data[0], item_data[1], item_data[2], item_data[3], item_data[4])
     cursor.execute(sql)
     db.commit()
   
@@ -76,7 +76,7 @@ def get_vote_items_010(firefox_login):
             shop_name = item.find_element_by_css_selector("a.shopname.J_MouseEneterLeave.J_ShopInfo")
             deal_count = item.find_element_by_css_selector("div.deal-cnt")
 
-            if price_f == 0.1:
+            if price_f > 0.1 and price_f <= 1:
                 insertDB(db, cursor, (item_id, item_name.text, shop_name.text, deal_count.text, price_f))
                 n += 1
         except NoSuchElementException:
@@ -120,7 +120,7 @@ def get_vote_items_pages(firefox_login, url):
     return n
 
 def job():
-    url_price_1 = 'https://s.taobao.com/search?q=%E6%8A%95%E7%A5%A8%E7%AE%B1&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_20180712&ie=utf8&sort=default&bcoffset=4&p4ppushleft=2%2C48&ntoffset=4&filter=reserve_price%5B0.1%2C0.1%5D'
+    url_price_1 = 'https://s.taobao.com/search?q=%E6%8A%95%E7%A5%A8%E7%AE%B1&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_20180712&ie=utf8&sort=default&bcoffset=4&p4ppushleft=2%2C48&ntoffset=4&filter=reserve_price%5B0.11%2C1%5D&s=0'
 
     firefox_cmd = 'taskkill /F /IM firefox.exe'
     firefox_gd = 'taskkill /F /IM geckodriver.exe'
@@ -143,7 +143,6 @@ def job():
         
 
 if __name__=='__main__': 
-    time.sleep(900)
     job()
     schedule.every(30).minutes.do(job)
     while True:
